@@ -1,19 +1,28 @@
 package com.mobeewave.githubbrowserapp.ui.main
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.mobeewave.githubbrowserapp.data.SearchResponse
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.mobeewave.githubbrowserapp.data.Repository
 import com.mobeewave.githubbrowserapp.repository.RepositoryRepository
-import retrofit2.Response
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
 class MainViewModel @Inject constructor(private val repositoryRepository: RepositoryRepository): ViewModel() {
 
 
-    fun searchRepositories(q: String, page: Int): LiveData<Response<SearchResponse>?> {
-        return repositoryRepository.searchRepositories(q, page)
+    private var searchResult: Flow<PagingData<Repository>>? = null
+    private var lastLanguageSearched: String? = null
+
+    fun searchRepositories(language: String): Flow<PagingData<Repository>> {
+        if (language == lastLanguageSearched && searchResult != null){
+            return searchResult!!
+        }
+        lastLanguageSearched = language
+        searchResult = repositoryRepository.searchRepositories(language).cachedIn(viewModelScope)
+        return searchResult!!
     }
 }
 

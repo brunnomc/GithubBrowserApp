@@ -1,26 +1,26 @@
 package com.mobeewave.githubbrowserapp.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.mobeewave.githubbrowserapp.api.GithubService
-import com.mobeewave.githubbrowserapp.data.SearchResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Response
+import com.mobeewave.githubbrowserapp.data.Repository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RepositoryRepository @Inject constructor(
     private val githubService: GithubService
 ) {
 
-    fun searchRepositories(q: String, page: Int): LiveData<Response<SearchResponse>?> {
-        val responseLiveData = MutableLiveData<Response<SearchResponse>?>()
+    fun searchRepositories(language: String) : Flow<PagingData<Repository>> {
+        return Pager(
+            config = PagingConfig(PAGE_SIZE),
+            pagingSourceFactory = { RepositoryPageSource(githubService, language) }
+        ).flow
+    }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            responseLiveData.postValue(githubService.searchRepositories(q, page))
-        }
-        return responseLiveData
+    companion object {
+        private const val PAGE_SIZE = 50
     }
 }
 

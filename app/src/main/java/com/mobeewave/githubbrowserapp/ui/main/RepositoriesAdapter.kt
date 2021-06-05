@@ -2,8 +2,9 @@ package com.mobeewave.githubbrowserapp.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mobeewave.githubbrowserapp.R
@@ -13,12 +14,14 @@ import com.mobeewave.githubbrowserapp.ui.main.RepositoriesAdapter.RepositoriesVi
 
 
 class RepositoriesAdapter :
-    ListAdapter<Repository, RepositoriesViewHolder>(RepositoryDiffCallback()) {
+    PagingDataAdapter<Repository, RepositoriesViewHolder>(RepositoryDiffCallback()) {
 
 
     override fun onBindViewHolder(holder: RepositoriesViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        if(item != null){
+            holder.bind(item)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoriesViewHolder {
